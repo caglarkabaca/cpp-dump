@@ -1,11 +1,11 @@
 #ifndef ASort_h
 #define ASort_h
-#include <iostream>
+
 #include <vector>
 
 template<class RandomAccessIterator, class Less>
 void xyz_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less) {
-    auto size = std::distance(first, beyond);
+    int size = std::distance(first, beyond);
     if (size < 2)
         return;
     
@@ -16,7 +16,6 @@ void xyz_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less
     
     // merge()
     std::vector<typename RandomAccessIterator::value_type> arr;
-    
     RandomAccessIterator l { first }, r { middle };
     const RandomAccessIterator im_middle { middle }, im_beyond { beyond };
     
@@ -41,5 +40,12 @@ void xyz_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less
         std::iter_swap(i, i_arr++);
     }
  }
+
+
+template <class InputIterator, class OutputIterator, class Less>
+OutputIterator xyz_sort (InputIterator first,
+          InputIterator beyond,
+          OutputIterator result,
+          Less less );
 
 #endif
