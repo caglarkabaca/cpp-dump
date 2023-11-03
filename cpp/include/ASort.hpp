@@ -8,6 +8,9 @@ namespace CKA
     template <class RandomAccessIterator, class Less>
     void xyz_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
     {
+        if (std::is_sorted(first, beyond)) // if sorted
+            return;
+
         int size = std::distance(first, beyond);
         if (size < 2)
             return;
@@ -27,28 +30,20 @@ namespace CKA
             if (!less(*r, *l))
             {
                 arr.push_back(*(l++));
+                continue;
             }
-            else
-            {
-                arr.push_back(*(r++));
-            }
-        }
-
-        while (l != im_middle)
-        {
-            arr.push_back(*(l++));
-        }
-
-        while (r != im_beyond)
-        {
             arr.push_back(*(r++));
         }
 
+        while (l != im_middle)
+            arr.push_back(*(l++));
+
+        while (r != im_beyond)
+            arr.push_back(*(r++));
+
         RandomAccessIterator i_arr = arr.begin();
         for (RandomAccessIterator i = first; i != beyond; ++i)
-        {
             std::iter_swap(i, i_arr++);
-        }
     }
 
     template <class InputIterator, class OutputIterator, class Less>

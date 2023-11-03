@@ -5,7 +5,7 @@
 
 #include "ASort.hpp"
 
-#define SIZE 100000
+#define SIZE 1000000
 
 // #define _DEBUG
 
