@@ -8,11 +8,34 @@ namespace CKA
     template <class RandomAccessIterator, class Less>
     void sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
     {
-        if (std::is_sorted(first, beyond)) // if sorted
+        bool is_sorted = true;
+        for (RandomAccessIterator i = first; i != beyond - 1; ++i)
+        {
+            if (!less(*i, *(i + 1)))
+            {
+                is_sorted = false;
+                break;
+            }
+        }
+
+        if (is_sorted)
             return;
 
-        if (std::is_sorted(first, beyond, std::greater_equal<>{})) // if sorted in reverse
+        bool is_sorted_in_reverse = true;
+        for (RandomAccessIterator i = first; i != beyond - 1; ++i)
+        {
+            if (less(*i, *(i + 1)))
+            {
+                is_sorted_in_reverse = false;
+                break;
+            }
+        }
+
+        if (is_sorted_in_reverse)
+        {
             std::reverse(first, beyond);
+            return;
+        }
 
         int size = std::distance(first, beyond);
         if (size < 2)
