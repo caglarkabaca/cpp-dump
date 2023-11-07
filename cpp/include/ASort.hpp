@@ -6,7 +6,7 @@
 namespace CKA
 {
     template <class RandomAccessIterator, class Less>
-    void xyz_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
+    void sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
     {
         if (std::is_sorted(first, beyond)) // if sorted
             return;
@@ -20,8 +20,8 @@ namespace CKA
 
         RandomAccessIterator middle = std::next(first, size / 2);
 
-        xyz_sort(first, middle, less);
-        xyz_sort(middle, beyond, less);
+        CKA::sort(first, middle, less);
+        CKA::sort(middle, beyond, less);
 
         // merge()
         std::vector<typename RandomAccessIterator::value_type> arr;
@@ -50,11 +50,11 @@ namespace CKA
     }
 
     template <class InputIterator, class OutputIterator, class Less>
-    OutputIterator xyz_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
+    OutputIterator sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
     {
         std::vector<typename InputIterator::value_type> random_arr;
         std::copy(first, beyond, std::back_inserter(random_arr));
-        xyz_sort(random_arr.begin(), random_arr.end(), less);
+        CKA::sort(random_arr.begin(), random_arr.end(), less);
 
         const OutputIterator c_result = result;
         for (auto i = random_arr.begin(); i != random_arr.end(); ++i)

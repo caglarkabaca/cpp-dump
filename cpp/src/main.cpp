@@ -5,7 +5,7 @@
 
 #include "ASort.hpp"
 
-#define SIZE 1000000
+#define SIZE 100
 
 // #define _DEBUG
 
@@ -27,8 +27,8 @@ int main()
 
     std::vector<int> arr_out(SIZE);
 
-    CKA::xyz_sort(arr.begin(), arr.end(), arr_out.begin(), std::less<int>());
-    CKA::xyz_sort(arr.begin(), arr.end(), std::less<int>());
+    CKA::sort(arr.begin(), arr.end(), arr_out.begin(), std::less<int>());
+    CKA::sort(arr.begin(), arr.end(), std::less<int>());
 
     std::cout << "First isSorted: "
               << std::is_sorted(std::begin(arr_out), std::end(arr_out))
