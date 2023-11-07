@@ -15,11 +15,13 @@ int main()
     std::vector<int> arr;
     std::random_device rd;
     std::mt19937 generator(rd());
-    std::uniform_int_distribution<int> distribution(1, INT16_MAX);
+    std::uniform_int_distribution<int> distribution(1, 10);
 
-    for (int i = 0; i < SIZE; ++i)
+    arr.push_back(distribution(generator) + 1);
+
+    for (int i = 1; i < SIZE; ++i)
     {
-        int randomValue = distribution(generator);
+        int randomValue = arr[i - 1] + (distribution(generator) - distribution(generator) / 2);
         arr.push_back(randomValue);
     }
 
