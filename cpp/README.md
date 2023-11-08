@@ -13,3 +13,7 @@ It uses **merge sort** to sort elements, but isn't completely non adaptive. It c
 #### Parameters
 * `first` , `beyond`	: the range of elements to sort
 * `less`: comparison function object  
+* `result`: the first element of output
+
+#### Returns
+* a OutputIterator of output's last element

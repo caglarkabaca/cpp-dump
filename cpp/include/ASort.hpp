@@ -5,12 +5,13 @@
 
 namespace CKA
 {
+    // it is classic merge sort with sortness checking before
     template <class RandomAccessIterator, class Less>
     void sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
     {
         bool is_sorted = true;
         for (RandomAccessIterator i = first; i != beyond - 1; ++i)
-        {
+        { // checks if the array already sorted in right way
             if (!less(*i, *(i + 1)))
             {
                 is_sorted = false;
@@ -23,7 +24,7 @@ namespace CKA
 
         bool is_sorted_in_reverse = true;
         for (RandomAccessIterator i = first; i != beyond - 1; ++i)
-        {
+        { // checks if the array already sorted in reverse way
             if (less(*i, *(i + 1)))
             {
                 is_sorted_in_reverse = false;
@@ -79,12 +80,11 @@ namespace CKA
         std::copy(first, beyond, std::back_inserter(random_arr));
         CKA::sort(random_arr.begin(), random_arr.end(), less);
 
-        const OutputIterator c_result = result;
         for (auto i = random_arr.begin(); i != random_arr.end(); ++i)
         {
             *(result++) = *i;
         }
-        return c_result;
+        return result;
     }
 }
 
