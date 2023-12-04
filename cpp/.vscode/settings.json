@@ -1,4 +1,9 @@
 {
+    "cmake.debugConfig": {
+        "args": [
+            "../poly11203.txt",
+        ]
+    },
     "files.associations": {
         "vector": "cpp",
         "__bit_reference": "cpp",
@@ -63,6 +68,10 @@
         "memory": "cpp",
         "random": "cpp",
         "type_traits": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "checkAPI.C": "cpp",
+        "fstream": "cpp",
+        "numeric": "cpp",
+        "list": "cpp"
     }
 }

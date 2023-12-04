@@ -3,12 +3,22 @@
 
 #include <vector>
 
+#ifdef DEBUG
+#include <iostream>
+#include <boost/timer/timer.hpp>
+#endif
+
+#define INSERTION_THRESHOLD 50
+
 namespace CKA
 {
-    // it is classic merge sort with sortness checking before
+    // it is adaptive merge sort with sortness checking before and insertion sort
     template <class RandomAccessIterator, class Less>
     void sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
     {
+#ifdef DEBUG
+        boost::timer::auto_cpu_timer timer;
+#endif
         bool is_sorted = true;
         for (RandomAccessIterator i = first; i != beyond - 1; ++i)
         { // checks if the array already sorted in right way
@@ -20,7 +30,12 @@ namespace CKA
         }
 
         if (is_sorted)
+        {
+#ifdef DEBUG
+            std::cout << "is_sorted return" << std::endl;
+#endif
             return;
+        }
 
         bool is_sorted_in_reverse = true;
         for (RandomAccessIterator i = first; i != beyond - 1; ++i)
@@ -35,12 +50,33 @@ namespace CKA
         if (is_sorted_in_reverse)
         {
             std::reverse(first, beyond);
+#ifdef DEBUG
+            std::cout << "is_sorted_in_reverse return" << std::endl;
+#endif
             return;
         }
 
         int size = std::distance(first, beyond);
-        if (size < 2)
+        // if size is too smol do insertion sort
+        if (size < INSERTION_THRESHOLD)
+        {
+            for (RandomAccessIterator i = first + 1; i != beyond; ++i)
+            {
+                typename std::iterator_traits<RandomAccessIterator>::value_type key = *i;
+                RandomAccessIterator j = i - 1;
+                while (j >= first && less(key, *j))
+                {
+                    *(j + 1) = *j;
+                    --j;
+                }
+
+                *(j + 1) = key;
+            }
+#ifdef DEBUG
+            std::cout << "insertion sort return" << std::endl;
+#endif
             return;
+        }
 
         RandomAccessIterator middle = std::next(first, size / 2);
 
@@ -48,11 +84,10 @@ namespace CKA
         CKA::sort(middle, beyond, less);
 
         // merge()
-        std::vector<typename RandomAccessIterator::value_type> arr;
+        std::vector<typename std::iterator_traits<RandomAccessIterator>::value_type> arr;
         RandomAccessIterator l{first}, r{middle};
-        const RandomAccessIterator im_middle{middle}, im_beyond{beyond};
 
-        while (l != im_middle && r != im_beyond)
+        while (l != middle && r != beyond)
         {
             if (!less(*r, *l))
             {
@@ -62,21 +97,25 @@ namespace CKA
             arr.push_back(*(r++));
         }
 
-        while (l != im_middle)
+        while (l != middle)
             arr.push_back(*(l++));
 
-        while (r != im_beyond)
+        while (r != beyond)
             arr.push_back(*(r++));
 
-        RandomAccessIterator i_arr = arr.begin();
-        for (RandomAccessIterator i = first; i != beyond; ++i)
+        auto i_arr = arr.begin();
+        for (auto i = first; i != beyond; ++i)
             std::iter_swap(i, i_arr++);
+
+#ifdef DEBUG
+        std::cout << "end of merge return" << std::endl;
+#endif
     }
 
     template <class InputIterator, class OutputIterator, class Less>
     OutputIterator sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
     {
-        std::vector<typename InputIterator::value_type> random_arr;
+        std::vector<typename std::iterator_traits<InputIterator>::value_type> random_arr;
         std::copy(first, beyond, std::back_inserter(random_arr));
         CKA::sort(random_arr.begin(), random_arr.end(), less);
 
