@@ -20,13 +20,23 @@ namespace CKA
         boost::timer::auto_cpu_timer timer;
 #endif
         bool is_sorted = true;
+        bool is_sorted_in_reverse = true;
+
         for (RandomAccessIterator i = first; i != beyond - 1; ++i)
         { // checks if the array already sorted in right way
-            if (!less(*i, *(i + 1)))
+            if (is_sorted && !less(*i, *(i + 1)))
             {
                 is_sorted = false;
-                break;
+                continue;
             }
+            if (is_sorted_in_reverse && less(*i, *(i + 1)))
+            {
+                is_sorted_in_reverse = false;
+                continue;
+                ;
+            }
+            if (!is_sorted && !is_sorted_in_reverse)
+                break;
         }
 
         if (is_sorted)
@@ -35,16 +45,6 @@ namespace CKA
             std::cout << "is_sorted return" << std::endl;
 #endif
             return;
-        }
-
-        bool is_sorted_in_reverse = true;
-        for (RandomAccessIterator i = first; i != beyond - 1; ++i)
-        { // checks if the array already sorted in reverse way
-            if (less(*i, *(i + 1)))
-            {
-                is_sorted_in_reverse = false;
-                break;
-            }
         }
 
         if (is_sorted_in_reverse)
@@ -78,13 +78,13 @@ namespace CKA
             return;
         }
 
-        RandomAccessIterator middle = std::next(first, size / 2);
-
+        RandomAccessIterator middle = first + size / 2;
         CKA::sort(first, middle, less);
         CKA::sort(middle, beyond, less);
 
         // merge()
         std::vector<typename std::iterator_traits<RandomAccessIterator>::value_type> arr;
+        arr.reserve(size);
         RandomAccessIterator l{first}, r{middle};
 
         while (l != middle && r != beyond)
@@ -116,14 +116,10 @@ namespace CKA
     OutputIterator sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
     {
         std::vector<typename std::iterator_traits<InputIterator>::value_type> random_arr;
+        random_arr.reserve(std::distance(first, beyond));
         std::copy(first, beyond, std::back_inserter(random_arr));
         CKA::sort(random_arr.begin(), random_arr.end(), less);
-
-        for (auto i = random_arr.begin(); i != random_arr.end(); ++i)
-        {
-            *(result++) = *i;
-        }
-        return result;
+        return std::copy(random_arr.begin(), random_arr.end(), result);
     }
 }
 
