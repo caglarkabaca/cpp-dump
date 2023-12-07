@@ -6,8 +6,11 @@
 #include <exception>
 #include <stdexcept>
 #include <vector>
+#include <cstdlib>
 
 #include <glm/gtc/matrix_transform.hpp>
+
+#define random_vec3() glm::vec3(std::rand() / static_cast<float>(RAND_MAX), std::rand() / static_cast<float>(RAND_MAX), std::rand() / static_cast<float>(RAND_MAX))
 
 // init glfw
 atom::Engine::Engine()
@@ -42,7 +45,7 @@ void atom::Engine::initWindow(int w, int h, const char *title)
     }
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.9255f, 0.9255f, 0.9255f, 0.0f);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -353,7 +356,7 @@ void atom::Engine::initWindow(int w, int h, const char *title)
 
     for (glm::vec3 v : _vertices)
     {
-        vertices.push_back(atom::Vertex{v.x, v.y, v.z, 1.f, 1.f, 1.f});
+        vertices.push_back(atom::Vertex(v, random_vec3()));
     }
 
     std::cout << "vertices count " << vertices.size() << std::endl;
@@ -382,6 +385,8 @@ void atom::Engine::loop()
     );
     // Model matrix : an identity matrix (model will be at the origin)
     glm::mat4 Model = glm::mat4(1.0f);
+    Model = glm::rotate(Model, (float)M_PI / 2.f, glm::vec3(0.f, -1.f, 0.f));
+    Model = glm::translate(Model, glm::vec3(0.f, -.5, 0.f));
     // Our ModelViewProjection : multiplication of our 3 matrices
     glm::mat4 MVP;
 
