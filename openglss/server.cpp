@@ -60,7 +60,7 @@ void server_thread()
 
     while (1)
     {
-        int val = write(sock, (void *)&game.View[0][0], sizeof(float) * 16);
+        int val = write(sock, (void *)&game.Model[0][0], sizeof(float) * 16);
         log() << "writted " << val << " bytes" << '\n';
 
         int wait = 0;

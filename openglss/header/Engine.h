@@ -25,6 +25,8 @@ namespace atom
         glm::mat4 View;
         glm::mat4 Projection;
 
+        bool client;
+
         Engine();
         void initWindow(int w, int h, const char *title);
         void loop();

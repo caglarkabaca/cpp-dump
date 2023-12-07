@@ -23,6 +23,7 @@ int main()
     std::thread client(client_thread);
 
     game.initWindow(800, 600, "CLIENT");
+    game.client = true; // disables imgui
     game.loop();
 
     client.join();
@@ -56,7 +57,7 @@ void client_thread()
     {
         valread = read(client, buffer, sizeof(buffer));
         log() << "readed " << valread << " bytes" << '\n';
-        game.View = glm::make_mat4(buffer);
+        game.Model = glm::make_mat4(buffer);
 
         write(client, "1", sizeof("1"));
     }
