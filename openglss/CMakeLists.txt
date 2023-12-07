@@ -15,3 +15,7 @@ file(GLOB SOURCES src/*.cpp)
 add_executable(server server.cpp ${SOURCES})
 set_property(TARGET server PROPERTY CXX_STANDARD 11)
 target_link_libraries(server GLEW::GLEW glfw glm::glm OpenGL::GL)
+
+add_executable(client client.cpp ${SOURCES})
+set_property(TARGET client PROPERTY CXX_STANDARD 11)
+target_link_libraries(client GLEW::GLEW glfw glm::glm OpenGL::GL)

@@ -369,7 +369,7 @@ void atom::Engine::initWindow(int w, int h, const char *title)
 void atom::Engine::loop()
 {
     GLuint MatrixID = glGetUniformLocation(shader, "MVP");
-    glm::mat4 Projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+    Projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
     // Or, for an ortho camera :
     // glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
@@ -378,13 +378,13 @@ void atom::Engine::loop()
     glm::vec3 camUp = glm::vec3(0, 1, 0);
 
     // Camera matrix
-    glm::mat4 View = glm::lookAt(
+    View = glm::lookAt(
         camPos,    // Camera is at (4,3,3), in World Space
         camTarget, // and looks at the origin
         camUp      // Head is up (set to 0,-1,0 to look upside-down)
     );
     // Model matrix : an identity matrix (model will be at the origin)
-    glm::mat4 Model = glm::mat4(1.0f);
+    Model = glm::mat4(1.0f);
     Model = glm::rotate(Model, (float)M_PI / 2.f, glm::vec3(0.f, -1.f, 0.f));
     Model = glm::translate(Model, glm::vec3(0.f, -.5, 0.f));
     // Our ModelViewProjection : multiplication of our 3 matrices
@@ -395,13 +395,6 @@ void atom::Engine::loop()
         // Model = glm::rotate(Model, (float)sin(glfwGetTime()) / 120.f, glm::vec3(.1f, 0.f, 0.f));
         // Model = glm::rotate(glm::mat4(1.f), (float)sin(glfwGetTime()), glm::vec3(0.1f, 0.f, 0.f));
 
-        camPos = glm::vec3(4, 3, 3) + glm::vec3(sin(glfwGetTime()) * 7, sin(glfwGetTime()) * 4, 0.f);
-
-        View = glm::lookAt(
-            camPos,    // Camera is at (4,3,3), in World Space
-            camTarget, // and looks at the origin
-            camUp      // Head is up (set to 0,-1,0 to look upside-down)
-        );
         MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

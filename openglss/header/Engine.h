@@ -12,7 +12,7 @@ namespace atom
 {
     class Engine
     {
-    private:
+    public:
         GLFWwindow *window;
 
         GLuint shader;
@@ -21,7 +21,10 @@ namespace atom
 
         std::vector<atom::Model> models;
 
-    public:
+        glm::mat4 Model;
+        glm::mat4 View;
+        glm::mat4 Projection;
+
         Engine();
         void initWindow(int w, int h, const char *title);
         void loop();
