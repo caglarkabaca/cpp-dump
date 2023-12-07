@@ -34,13 +34,13 @@ void camera_move()
 int main()
 {
 
-    std::thread camera_thread(camera_move);
+    // std::thread camera_thread(camera_move);
 
     game.initWindow(800, 600, "SERVER");
     std::thread server(server_thread);
     game.loop();
 
-    camera_thread.join();
+    // camera_thread.join();
     server.join();
     return 0;
 }

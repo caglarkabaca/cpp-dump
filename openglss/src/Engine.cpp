@@ -9,6 +9,11 @@
 #include <cstdlib>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 #define random_vec3() glm::vec3(std::rand() / static_cast<float>(RAND_MAX), std::rand() / static_cast<float>(RAND_MAX), std::rand() / static_cast<float>(RAND_MAX))
 
@@ -51,6 +56,17 @@ void atom::Engine::initWindow(int w, int h, const char *title)
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
 
     shader = LoadShaders("shaders/vertex.glsl", "shaders/fragment.glsl");
 
@@ -385,13 +401,30 @@ void atom::Engine::loop()
     );
     // Model matrix : an identity matrix (model will be at the origin)
     Model = glm::mat4(1.0f);
-    Model = glm::rotate(Model, (float)M_PI / 2.f, glm::vec3(0.f, -1.f, 0.f));
-    Model = glm::translate(Model, glm::vec3(0.f, -.5, 0.f));
+    // Model = glm::rotate(Model, (float)M_PI / 2.f, glm::vec3(0.f, -1.f, 0.f));
+    // Model = glm::translate(Model, glm::vec3(0.f, -.5, 0.f));
     // Our ModelViewProjection : multiplication of our 3 matrices
     glm::mat4 MVP;
 
+    glm::vec3 modelPos = glm::vec3(0.f);
+    glm::vec3 modelRot = glm::vec3(0.f, -90.f, 0.f);
+
     do
     {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Text("Model");
+        ImGui::InputFloat3("Pos", glm::value_ptr(modelPos));
+        ImGui::InputFloat3("Rotation", glm::value_ptr(modelRot));
+
+        Model = glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
+                glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
+                glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
+                glm::mat4(1.f);
+        Model = glm::translate(glm::mat4(1.f), modelPos) * Model;
+
         // Model = glm::rotate(Model, (float)sin(glfwGetTime()) / 120.f, glm::vec3(.1f, 0.f, 0.f));
         // Model = glm::rotate(glm::mat4(1.f), (float)sin(glfwGetTime()), glm::vec3(0.1f, 0.f, 0.f));
 
@@ -409,6 +442,9 @@ void atom::Engine::loop()
             model.draw();
         }
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -420,5 +456,8 @@ void atom::Engine::loop()
 
 atom::Engine::~Engine()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
 };
