@@ -64,6 +64,16 @@ void atom::Model::draw(glm::mat4 &projection, glm::mat4 &view)
     glDrawArrays(GL_TRIANGLES, 0, vertex_count); // 3 indices starting at 0 -> 1 triangle
 }
 
+void atom::Model::updatePosition()
+{
+    glm::mat4 Model = glm::rotate(glm::mat4(1.0f), glm::radians(modelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
+                      glm::rotate(glm::mat4(1.0f), glm::radians(modelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
+                      glm::rotate(glm::mat4(1.0f), glm::radians(modelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
+                      glm::mat4(1.f);
+    Model = glm::translate(glm::mat4(1.f), modelPosition) * Model;
+    ModelMatrix = glm::mat4(Model);
+}
+
 // #########################################################################################
 
 std::vector<atom::Vertex> atom::ObjModel::getBuffer(char *objPath)

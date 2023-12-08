@@ -34,8 +34,12 @@ namespace atom
         glm::mat4 mvp = glm::mat4(1.f);
         glm::mat4 ModelMatrix = glm::mat4(1.f);
 
+        glm::vec3 modelPosition = glm::vec3(0.f);
+        glm::vec3 modelRotation = glm::vec3(0.f);
+
     public:
         Model(atom::Shader _shader, std::vector<atom::Vertex> buffer);
+        void updatePosition();
         void draw(glm::mat4 &projection, glm::mat4 &view);
         // ~Model();
     };
@@ -44,9 +48,9 @@ namespace atom
     {
     private:
         std::vector<atom::Vertex> getBuffer(char *objPath);
-        char *obj;
 
     public:
+        char *obj;
         ObjModel(atom::Shader _shader, char *objPath);
         void serialize(int id, char *buffer);
     };

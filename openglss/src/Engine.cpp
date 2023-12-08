@@ -77,6 +77,9 @@ void atom::Engine::initWindow(int w, int h, const char *title)
     glm::vec3 camTarget = glm::vec3(0);
     glm::vec3 camUp = glm::vec3(0, 1, 0);
 
+    if (client)
+        camPos = glm::vec3(-4, 3, -3);
+
     View = glm::lookAt(
         camPos,    // Camera is at (4,3,3), in World Space
         camTarget, // and looks at the origin
@@ -394,18 +397,14 @@ void atom::Engine::loop()
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-
-            ImGui::Text("Model");
-            ImGui::InputFloat3("Pos", glm::value_ptr(modelPos));
-            ImGui::InputFloat3("Rotation", glm::value_ptr(modelRot));
-
-            Model = glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                    glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                    glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
-                    glm::mat4(1.f);
-            Model = glm::translate(glm::mat4(1.f), modelPos) * Model;
-
-            models[0]->ModelMatrix = glm::mat4(Model);
+            for (atom::ObjModel *model : models)
+            {
+                ImGui::Begin(model->obj);
+                ImGui::InputFloat3("Pos", glm::value_ptr(model->modelPosition));
+                ImGui::InputFloat3("Rotation", glm::value_ptr(model->modelRotation));
+                model->updatePosition();
+                ImGui::End();
+            }
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -423,6 +422,7 @@ void atom::Engine::loop()
 
         // Swap buffers
         glfwSwapBuffers(window);
+
         glfwPollEvents();
 
     } // Check if the ESC key was pressed or the window was closed

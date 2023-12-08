@@ -23,8 +23,8 @@ atom::Engine game;
 int main()
 {
     std::thread client(client_thread);
-    game.initWindow(800, 600, "CLIENT");
     game.client = true;
+    game.initWindow(800, 600, "CLIENT");
 
     // atom::Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
     // atom::ObjModel model(shader.copy(), "shaders/tavsikucgen.obj");
@@ -99,10 +99,10 @@ void client_thread()
         // game.models.push_back(mdl);
         // mdl->mvp = glm::make_mat4(mvp);
 
-        if (id >= game.models.size() - 1)
+        if (id < game.models.size())
         {
             game.models[id]->ModelMatrix = glm::make_mat4(mvp);
-            log() << glm::to_string(game.models[0]->ModelMatrix) << '\n';
+            // log() << glm::to_string(game.models[id]->ModelMatrix) << '\n';
         }
         else
         {
