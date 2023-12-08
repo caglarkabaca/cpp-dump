@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+
 #include "Model.h"
 
 namespace atom
@@ -19,7 +20,8 @@ namespace atom
         GLuint VertexArrayID;
         GLuint vertexbuffer;
 
-        std::vector<atom::Model> models;
+        std::vector<atom::ObjModel *> models;
+        // std::vector<std::string> appendQueue;
 
         glm::mat4 Model;
         glm::mat4 View;

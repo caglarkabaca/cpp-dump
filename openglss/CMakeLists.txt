@@ -3,6 +3,8 @@ cmake_policy(VERSION 3.5)
 
 project(openglss LANGUAGES CXX)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 find_package(GLEW REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
@@ -11,6 +13,9 @@ find_package(OpenGL REQUIRED)
 include_directories(header)
 include_directories(imgui)
 include_directories(imgui/backends)
+
+include_directories(src)
+
 file(COPY ./shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 file(GLOB SOURCES src/*.cpp imgui/*.cpp imgui/backends/*.cpp)

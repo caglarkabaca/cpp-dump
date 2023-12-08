@@ -1,6 +1,8 @@
 #include "Engine.h"
 
-#include "utils.h"
+#ifndef SHADER_H
+#include "Shader.h"
+#endif
 
 #include <cstdio>
 #include <exception>
@@ -14,8 +16,6 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
-#define random_vec3() glm::vec3(std::rand() / static_cast<float>(RAND_MAX), std::rand() / static_cast<float>(RAND_MAX), std::rand() / static_cast<float>(RAND_MAX))
 
 // init glfw
 atom::Engine::Engine()
@@ -70,8 +70,6 @@ void atom::Engine::initWindow(int w, int h, const char *title)
         ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
         ImGui_ImplOpenGL3_Init();
     }
-
-    shader = LoadShaders("shaders/vertex.glsl", "shaders/fragment.glsl");
 
     /* box
 
@@ -360,54 +358,22 @@ void atom::Engine::initWindow(int w, int h, const char *title)
     };
 
     */
-
-    std::vector<glm::vec3> _vertices;
-    std::vector<glm::vec2> uvs;
-    std::vector<glm::vec3> normals; // Won't be used at the moment.
-
-    bool res = loadOBJ("shaders/tavsikucgen.obj", _vertices, uvs, normals);
-    if (res)
-    {
-        std::cout << "Loaded" << std::endl;
-    }
-
-    std::vector<atom::Vertex> vertices;
-
-    for (glm::vec3 v : _vertices)
-    {
-        vertices.push_back(atom::Vertex(v, random_vec3()));
-    }
-
-    std::cout << "vertices count " << vertices.size() << std::endl;
-
-    atom::Model model(shader, vertices);
-    models.push_back(model);
-    models.push_back(model);
 }
 
 void atom::Engine::loop()
 {
-    GLuint MatrixID = glGetUniformLocation(shader, "MVP");
     Projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-    // Or, for an ortho camera :
-    // glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
     glm::vec3 camPos = glm::vec3(4, 3, 3);
     glm::vec3 camTarget = glm::vec3(0);
     glm::vec3 camUp = glm::vec3(0, 1, 0);
 
-    // Camera matrix
     View = glm::lookAt(
         camPos,    // Camera is at (4,3,3), in World Space
         camTarget, // and looks at the origin
         camUp      // Head is up (set to 0,-1,0 to look upside-down)
     );
-    // Model matrix : an identity matrix (model will be at the origin)
     Model = glm::mat4(1.0f);
-    // Model = glm::rotate(Model, (float)M_PI / 2.f, glm::vec3(0.f, -1.f, 0.f));
-    // Model = glm::translate(Model, glm::vec3(0.f, -.5, 0.f));
-    // Our ModelViewProjection : multiplication of our 3 matrices
-    glm::mat4 MVP;
 
     glm::vec3 modelPos = glm::vec3(0.f);
     glm::vec3 modelRot = glm::vec3(0.f, -90.f, 0.f);
@@ -431,21 +397,11 @@ void atom::Engine::loop()
             Model = glm::translate(glm::mat4(1.f), modelPos) * Model;
         }
 
-        // Model = glm::rotate(Model, (float)sin(glfwGetTime()) / 120.f, glm::vec3(.1f, 0.f, 0.f));
-        // Model = glm::rotate(glm::mat4(1.f), (float)sin(glfwGetTime()), glm::vec3(0.1f, 0.f, 0.f));
-
-        MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Use our shader
-        glUseProgram(shader);
-
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-        for (atom::Model model : models)
+        for (atom::Model *model : models)
         {
-            model.draw();
+            model->draw(Model, View, Projection);
         }
 
         if (!client)

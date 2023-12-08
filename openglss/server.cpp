@@ -17,30 +17,18 @@
 void server_thread();
 
 atom::Engine game;
-void camera_move()
-{
-    while (true)
-    {
-        glm::vec3 camPos = glm::vec3(4, 3, 3) + glm::vec3(sin(glfwGetTime()) * 7, sin(glfwGetTime()) * 4, 0.f);
-
-        game.View = glm::lookAt(
-            camPos,            // Camera is at (4,3,3), in World Space
-            glm::vec3(0.f),    // and looks at the origin
-            glm::vec3(0, 1, 0) // Head is up (set to 0,-1,0 to look upside-down)
-        );
-    }
-}
 
 int main()
 {
-
-    // std::thread camera_thread(camera_move);
-
     game.initWindow(800, 600, "SERVER");
+
+    atom::Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+    atom::ObjModel model(shader.copy(), "shaders/tavsikucgen.obj");
+    game.models.push_back(&model);
+
     std::thread server(server_thread);
     game.loop();
 
-    // camera_thread.join();
     server.join();
     return 0;
 }
@@ -60,8 +48,11 @@ void server_thread()
 
     while (1)
     {
-        int val = write(sock, (void *)&game.Model[0][0], sizeof(float) * 16);
-        log() << "writted " << val << " bytes" << '\n';
+        char bf[1024];
+        game.models[0]->serialize(0, bf);
+        int val = write(sock, bf, sizeof(bf));
+        log() << "sizeof " << sizeof(bf) << " writted " << val << " bytes" << '\n';
+        log() << bf << '\n';
 
         int wait = 0;
         do
