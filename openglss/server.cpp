@@ -48,18 +48,21 @@ void server_thread()
 
     while (1)
     {
+        log() << glm::to_string(game.models[0]->ModelMatrix) << '\n';
         char bf[1024];
         game.models[0]->serialize(0, bf);
         int val = write(sock, bf, sizeof(bf));
-        log() << "sizeof " << sizeof(bf) << " writted " << val << " bytes" << '\n';
-        log() << bf << '\n';
+        // log() << "sizeof " << sizeof(bf) << " writted " << val << " bytes" << '\n';
+        // log() << bf << '\n';
+
+        val = write(sock, &game.models[0]->ModelMatrix[0][0], sizeof(game.models[0]->ModelMatrix));
 
         int wait = 0;
         do
         {
             char bf[2];
             wait = read(sock, bf, sizeof(bf));
-            log() << "got response " << bf << '\n';
+            // log() << "got response " << bf << '\n';
         } while (wait <= 0);
     }
 

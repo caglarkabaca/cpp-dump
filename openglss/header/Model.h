@@ -6,12 +6,21 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <string>
 
 #include "Shader.h"
 #include "Vertex.h"
 
 namespace atom
 {
+    struct ModelBlueprint
+    {
+        int id;
+        std::string vertexShader;
+        std::string fragmentShader;
+        std::string obj;
+    };
+    typedef struct ModelBlueprint ModelBlueprint;
     class Model
     {
     public:
@@ -23,10 +32,11 @@ namespace atom
 
         GLuint MVP;
         glm::mat4 mvp = glm::mat4(1.f);
+        glm::mat4 ModelMatrix = glm::mat4(1.f);
 
     public:
         Model(atom::Shader _shader, std::vector<atom::Vertex> buffer);
-        void draw(glm::mat4 &model, glm::mat4 &view, glm::mat4 &projection);
+        void draw(glm::mat4 &projection, glm::mat4 &view);
         // ~Model();
     };
 

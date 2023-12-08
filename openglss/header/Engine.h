@@ -21,9 +21,9 @@ namespace atom
         GLuint vertexbuffer;
 
         std::vector<atom::ObjModel *> models;
-        // std::vector<std::string> appendQueue;
+        std::vector<atom::ModelBlueprint> appendQueue;
 
-        glm::mat4 Model;
+        glm::mat4 Model = glm::mat4(1.f);
         glm::mat4 View;
         glm::mat4 Projection;
 

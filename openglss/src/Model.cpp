@@ -30,10 +30,10 @@ atom::Model::Model(atom::Shader _shader, std::vector<atom::Vertex> buffer) : sha
     vertices = buffer;
 }
 
-void atom::Model::draw(glm::mat4 &model, glm::mat4 &view, glm::mat4 &projection)
+void atom::Model::draw(glm::mat4 &projection, glm::mat4 &view)
 {
 
-    mvp = projection * view * model;
+    mvp = projection * view * ModelMatrix;
 
     glUseProgram(shader.getProgram());
     glUniformMatrix4fv(MVP, 1, GL_FALSE, &mvp[0][0]);
@@ -92,5 +92,5 @@ atom::ObjModel::ObjModel(atom::Shader _shader, char *objPath) : Model(_shader, g
 
 void atom::ObjModel::serialize(int id, char *buffer)
 {
-    snprintf(buffer, 1024, "%d&%s&%s&%s&%s", id, obj, shader.vertexShaderPath, shader.fragmentShaderPath, glm::to_string(mvp).c_str());
+    snprintf(buffer, 1024, "%d&%s&%s&%s", id, obj, shader.vertexShaderPath, shader.fragmentShaderPath);
 }

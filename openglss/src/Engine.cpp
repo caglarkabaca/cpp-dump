@@ -71,6 +71,18 @@ void atom::Engine::initWindow(int w, int h, const char *title)
         ImGui_ImplOpenGL3_Init();
     }
 
+    Projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+
+    glm::vec3 camPos = glm::vec3(4, 3, 3);
+    glm::vec3 camTarget = glm::vec3(0);
+    glm::vec3 camUp = glm::vec3(0, 1, 0);
+
+    View = glm::lookAt(
+        camPos,    // Camera is at (4,3,3), in World Space
+        camTarget, // and looks at the origin
+        camUp      // Head is up (set to 0,-1,0 to look upside-down)
+    );
+
     /* box
 
     std::vector<atom::Vertex> vertices{
@@ -362,24 +374,21 @@ void atom::Engine::initWindow(int w, int h, const char *title)
 
 void atom::Engine::loop()
 {
-    Projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-
-    glm::vec3 camPos = glm::vec3(4, 3, 3);
-    glm::vec3 camTarget = glm::vec3(0);
-    glm::vec3 camUp = glm::vec3(0, 1, 0);
-
-    View = glm::lookAt(
-        camPos,    // Camera is at (4,3,3), in World Space
-        camTarget, // and looks at the origin
-        camUp      // Head is up (set to 0,-1,0 to look upside-down)
-    );
-    Model = glm::mat4(1.0f);
-
     glm::vec3 modelPos = glm::vec3(0.f);
     glm::vec3 modelRot = glm::vec3(0.f, -90.f, 0.f);
 
     do
     {
+
+        while (appendQueue.size() > 0)
+        {
+            atom::ModelBlueprint blueprint = *(appendQueue.begin());
+            atom::Shader shader((char *)blueprint.vertexShader.c_str(), (char *)blueprint.fragmentShader.c_str());
+            atom::ObjModel *mdl = new atom::ObjModel(shader.copy(), (char *)blueprint.obj.c_str());
+            models.push_back(mdl);
+            appendQueue.erase(appendQueue.begin());
+        }
+
         if (!client)
         {
             ImGui_ImplOpenGL3_NewFrame();
@@ -395,13 +404,15 @@ void atom::Engine::loop()
                     glm::rotate(glm::mat4(1.0f), glm::radians(modelRot.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
                     glm::mat4(1.f);
             Model = glm::translate(glm::mat4(1.f), modelPos) * Model;
+
+            models[0]->ModelMatrix = glm::mat4(Model);
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (atom::Model *model : models)
         {
-            model->draw(Model, View, Projection);
+            model->draw(Projection, View);
         }
 
         if (!client)

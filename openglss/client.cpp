@@ -5,12 +5,14 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <algorithm>
 
 #include <string>
 
 #include "Engine.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include "glm/gtx/string_cast.hpp"
 
 #define log(x) std::cout << "CLIENT: "
 
@@ -22,6 +24,7 @@ int main()
 {
     std::thread client(client_thread);
     game.initWindow(800, 600, "CLIENT");
+    game.client = true;
 
     // atom::Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
     // atom::ObjModel model(shader.copy(), "shaders/tavsikucgen.obj");
@@ -58,26 +61,21 @@ void client_thread()
     char buffer[1024];
     game.models.clear();
 
-    atom::ObjModel *mdl;
     while (1)
     {
         memset(buffer, 0, 1024);
         valread = read(client, &buffer, sizeof(buffer));
         if (valread <= 0)
             continue;
-        free(mdl);
-        game.models.clear();
-        log() << "readed " << valread << " bytes" << '\n';
-        log() << buffer << '\n';
+        // log() << "readed " << valread << " bytes" << '\n';
+        // log() << buffer << '\n';
 
         int id;
         char obj[1024];
         char vertexShader[1024];
         char fragmentShader[1024];
-        char mvp[1024];
 
         char *token;
-
         token = strtok(buffer, "&");
         id = atoi(token);
         token = strtok(NULL, "&");
@@ -86,19 +84,46 @@ void client_thread()
         strcpy(vertexShader, token);
         token = strtok(NULL, "&");
         strcpy(fragmentShader, token);
-        token = strtok(NULL, "&");
-        strcpy(mvp, token);
 
-        log() << id << '\n'
-              << obj << '\n'
-              << vertexShader << '\n'
-              << fragmentShader << '\n'
-              << mvp << '\n';
+        float mvp[128];
+        valread = read(client, mvp, sizeof(mvp));
+
+        // log() << id << '\n'
+        //       << obj << '\n'
+        //       << vertexShader << '\n'
+        //       << fragmentShader << '\n'
+        //       << mvp << '\n';
 
         // atom::Shader shader(vertexShader, fragmentShader);
         // mdl = new atom::ObjModel(shader.copy(), obj);
         // game.models.push_back(mdl);
         // mdl->mvp = glm::make_mat4(mvp);
+
+        if (id >= game.models.size() - 1)
+        {
+            game.models[id]->ModelMatrix = glm::make_mat4(mvp);
+            log() << glm::to_string(game.models[0]->ModelMatrix) << '\n';
+        }
+        else
+        {
+            bool isIn = false;
+            for (atom::ModelBlueprint blueprint : game.appendQueue)
+            {
+                if (blueprint.id == id)
+                {
+                    isIn = true;
+                    break;
+                }
+            }
+            if (!isIn)
+            {
+                game.appendQueue.push_back(atom::ModelBlueprint{
+                    .id = id,
+                    .vertexShader = std::string(vertexShader),
+                    .fragmentShader = std::string(fragmentShader),
+                    .obj = std::string(obj)});
+            }
+        }
 
         write(client, "1", sizeof("1"));
     }
